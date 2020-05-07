@@ -3,6 +3,7 @@
   "version": "1.0.0-alpha.5",
   "description": "A pino browser transmit that send log statements over HTTP",
   "main": "index.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "test": "tap --no-cov 'test/**/*.test.js'",
     "lint": "standard",
@@ -35,6 +36,7 @@
     "tap": "^10.2.2"
   },
   "dependencies": {
+    "@types/pino": "^4.16.1",
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1"
   },
