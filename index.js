@@ -73,6 +73,12 @@ function transmitHttp (inOpts) {
       } catch (e) {
         console.error('pino-transmit-http: Failed to transmit logs')
       }
+    },
+    flush: async function () {
+      if (typeof send.flush === 'function') {
+        return send.flush()
+      }
+      return rawSend()
     }
   }
 };
