@@ -36,7 +36,7 @@ function transmitHttp (inOpts) {
         : opts.headers
 
       // convert collected logs to string and clear the collector array
-      let data = (typeof opts.prepareBody === 'function')
+      const data = (typeof opts.prepareBody === 'function')
         ? await opts.prepareBody(collection)
         : JSON.stringify(collection)
       collection = []
