@@ -10,7 +10,11 @@ const defaultOptions = {
   url: '/log',
   useSendBeacon: true,
   method: 'POST',
-  fetch: null
+  fetch: null,
+  headers: null,
+  onError: null,
+  prepareBody: null,
+  prepareHeaders: null
 }
 
 function transmitHttp (inOpts) {
@@ -19,20 +23,36 @@ function transmitHttp (inOpts) {
   let collection = []
   let isUnloading = false
 
-  function rawSend () {
+  async function rawSend () {
     try {
       // short circuit if the method is called without any logs collected
       if (collection.length === 0) {
         return
       }
 
+      // send headers to prepareHeaders function if provided
+      opts.headers = (typeof opts.prepareHeaders === 'function')
+        ? await opts.prepareHeaders(opts.headers)
+        : opts.headers
+
       // convert collected logs to string and clear the collector array
-      let data = JSON.stringify(collection)
+      let data = (typeof opts.prepareBody === 'function')
+        ? await opts.prepareBody(collection)
+        : JSON.stringify(collection)
       collection = []
 
-      return httpSend(data, isUnloading, opts)
+      const sendHeaders = (opts.headers)
+        ? { headers: Object.assign({}, opts.headers) }
+        : {}
+      const sendOpts = Object.assign({}, opts, sendHeaders)
+
+      return httpSend(data, isUnloading, sendOpts)
         .catch(function catchFn (e) {
-          console.error(e)
+          if (typeof opts.onError === 'function') {
+            opts.onError(e, data, sendOpts.headers)
+          } else {
+            console.error(e)
+          }
         })
     } catch (e) {
       console.error(e)
